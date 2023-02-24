@@ -66,15 +66,12 @@ const updateById = async (req, res) => {
   if (error) {
     throw HttpError(400, error.message);
   }
-  const contact = await Contact.findById(contactId);
-  if (!contact) {
-    throw HttpError(404, `Contact with id=${contactId} not found`);
-  }
-  const updatedContact = { ...contact._doc, ...req.body };
-  const result = await Contact.findByIdAndUpdate(contactId, updatedContact, {
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });
-
+  if (!result) {
+    throw HttpError(404, `Contact with id=${contactId} not found`);
+  }
   res.json({
     status: 'success',
     code: 200,
