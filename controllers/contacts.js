@@ -8,7 +8,8 @@ const {
 } = require('../utils');
 
 const getAll = async (req, res) => {
-  const contacts = await Contact.find();
+  const { _id: owner } = req.user;
+  const contacts = await Contact.find({ owner }, '-createdAt -updatedAt');
   res.json({
     status: 'success',
     code: 200,
@@ -28,11 +29,12 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
+  const { _id: owner } = req.user;
   const { error } = contactsAddJoiSchema.validate(req.body);
   if (error) {
     throw HttpError(400, error.message);
   }
-  const result = await Contact.create(req.body);
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json({
     status: 'success',
     code: 201,

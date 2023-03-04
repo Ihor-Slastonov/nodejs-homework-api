@@ -1,6 +1,11 @@
-const { contactsAddJoiSchema, contactsJoiUpdateSchema, contactJoiFavoriteSchema } = require('./contactsValidate');
+const {
+  contactsAddJoiSchema,
+  contactsJoiUpdateSchema,
+  contactJoiFavoriteSchema,
+} = require('./contactsValidate');
 const HttpError = require('./HttpError');
 const ctrlWrapper = require('./ctrlWrapper');
+const { usersRegJoiSchema, usersLoginJoiSchema } = require('./usersValidate');
 
 module.exports = {
   contactsAddJoiSchema,
@@ -8,4 +13,6 @@ module.exports = {
   contactJoiFavoriteSchema,
   HttpError,
   ctrlWrapper,
+  usersRegJoiSchema,
+  usersLoginJoiSchema
 };
