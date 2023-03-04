@@ -5,6 +5,7 @@ const User = require('../models/user');
 const {
   usersRegJoiSchema,
   usersLoginJoiSchema,
+  usersUpdateSubsriptionJoiSchema,
   HttpError,
   ctrlWrapper,
 } = require('../utils');
@@ -93,9 +94,27 @@ const getCurrent = async (req, res) => {
   });
 };
 
+const updateUserSubscription = async (req, res) => {
+  const { _id } = req.user;
+  const { error } = usersUpdateSubsriptionJoiSchema.validate(req.body);
+  if (error) {
+    throw HttpError(400, error.message);
+  }
+  const user = await User.findByIdAndUpdate(_id, req.body, { new: true });
+  res.json({
+    status: 'success',
+    code: 200,
+    data: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
+};
+
 module.exports = {
   singup: ctrlWrapper(singup),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrent: ctrlWrapper(getCurrent),
+  updateUserSubscription: ctrlWrapper(updateUserSubscription),
 };

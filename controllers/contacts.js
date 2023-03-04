@@ -9,7 +9,20 @@ const {
 
 const getAll = async (req, res) => {
   const { _id: owner } = req.user;
-  const contacts = await Contact.find({ owner }, '-createdAt -updatedAt');
+  let query = { owner };
+
+  let { page = 1, limit = 20, favorite = null } = req.query;
+  limit = limit > 20 ? 20 : limit;
+  const skip = (page - 1) * limit;
+
+  if (favorite) {
+    query = { owner, favorite };
+  }
+
+  const contacts = await Contact.find(query, '-createdAt -updatedAt', {
+    skip,
+    limit,
+  });
   res.json({
     status: 'success',
     code: 200,
