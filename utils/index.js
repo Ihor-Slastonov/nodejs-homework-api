@@ -10,6 +10,7 @@ const {
   usersLoginJoiSchema,
   usersUpdateSubsriptionJoiSchema,
 } = require('./usersValidate');
+const contactsQuery = require('./contactsQuery')
 
 module.exports = {
   contactsAddJoiSchema,
@@ -20,4 +21,5 @@ module.exports = {
   usersRegJoiSchema,
   usersLoginJoiSchema,
   usersUpdateSubsriptionJoiSchema,
+  contactsQuery
 };
