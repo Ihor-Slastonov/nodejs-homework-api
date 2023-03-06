@@ -5,10 +5,21 @@ const {
   contactJoiFavoriteSchema,
   HttpError,
   ctrlWrapper,
+  contactsQuery,
 } = require('../utils');
 
 const getAll = async (req, res) => {
-  const contacts = await Contact.find();
+  const { _id: owner } = req.user;
+
+  let { page = 1, limit = 20 } = req.query;
+  limit = limit > 20 ? 20 : limit;
+  const skip = (page - 1) * limit;
+
+  const query = contactsQuery(owner, req.query);
+  const contacts = await Contact.find(query, '-createdAt -updatedAt', {
+    skip,
+    limit,
+  });
   res.json({
     status: 'success',
     code: 200,
@@ -20,7 +31,9 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await Contact.findById(contactId);
+  const { _id: owner } = req.user;
+
+  const result = await Contact.findOne({ _id: contactId, owner });
   if (!result) {
     throw HttpError(404, `Contact with id=${contactId} not found`);
   }
@@ -28,11 +41,12 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
+  const { _id: owner } = req.user;
   const { error } = contactsAddJoiSchema.validate(req.body);
   if (error) {
     throw HttpError(400, error.message);
   }
-  const result = await Contact.create(req.body);
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json({
     status: 'success',
     code: 201,
@@ -44,7 +58,9 @@ const add = async (req, res) => {
 
 const deleteById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await Contact.findByIdAndRemove(contactId);
+  const { _id: owner } = req.user;
+
+  const result = await Contact.findOneAndDelete({ _id: contactId, owner });
   if (!result) {
     throw HttpError(404, `Contact with id=${contactId} not found`);
   }
@@ -59,6 +75,8 @@ const deleteById = async (req, res) => {
 
 const updateById = async (req, res) => {
   const { contactId } = req.params;
+  const { _id: owner } = req.user;
+
   if (Object.keys(req.body).length === 0) {
     throw HttpError(400, 'missing fields');
   }
@@ -66,9 +84,13 @@ const updateById = async (req, res) => {
   if (error) {
     throw HttpError(400, error.message);
   }
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
+  const result = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
+    req.body,
+    {
+      new: true,
+    }
+  );
   if (!result) {
     throw HttpError(404, `Contact with id=${contactId} not found`);
   }
@@ -83,6 +105,7 @@ const updateById = async (req, res) => {
 
 const updateFavoriteById = async (req, res) => {
   const { contactId } = req.params;
+  const { _id: owner } = req.user;
 
   if (Object.keys(req.body).length === 0) {
     throw HttpError(400, 'missing field favorite');
@@ -91,9 +114,13 @@ const updateFavoriteById = async (req, res) => {
   if (error) {
     throw HttpError(400, error.message);
   }
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
+  const result = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
+    req.body,
+    {
+      new: true,
+    }
+  );
   if (!result) {
     throw HttpError(404, `Contact with id=${contactId} not found`);
   }
