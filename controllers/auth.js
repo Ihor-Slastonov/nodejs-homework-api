@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
 
 const User = require('../models/user');
 const {
@@ -8,6 +9,7 @@ const {
   usersUpdateSubsriptionJoiSchema,
   HttpError,
   ctrlWrapper,
+  uploadUserAvatar,
 } = require('../utils');
 
 require('dotenv').config();
@@ -26,8 +28,13 @@ const singup = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
   res.status(201).json({
     status: 'success',
@@ -111,10 +118,24 @@ const updateUserSubscription = async (req, res) => {
   });
 };
 
+const updateUserAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const avatarURL = uploadUserAvatar(_id, req.file);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  res.json({
+    status: 'success',
+    code: 200,
+    data: {
+      avatarURL,
+    },
+  });
+};
+
 module.exports = {
   singup: ctrlWrapper(singup),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrent: ctrlWrapper(getCurrent),
   updateUserSubscription: ctrlWrapper(updateUserSubscription),
+  updateUserAvatar: ctrlWrapper(updateUserAvatar),
 };
