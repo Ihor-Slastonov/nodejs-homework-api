@@ -10,7 +10,9 @@ const {
   usersLoginJoiSchema,
   usersUpdateSubsriptionJoiSchema,
 } = require('./usersValidate');
-const contactsQuery = require('./contactsQuery')
+const contactsQuery = require('./contactsQuery');
+
+const uploadUserAvatar = require('./uploadUserAvatar');
 
 module.exports = {
   contactsAddJoiSchema,
@@ -21,5 +23,6 @@ module.exports = {
   usersRegJoiSchema,
   usersLoginJoiSchema,
   usersUpdateSubsriptionJoiSchema,
-  contactsQuery
+  contactsQuery,
+  uploadUserAvatar,
 };
