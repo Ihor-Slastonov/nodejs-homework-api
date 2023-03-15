@@ -20,8 +20,15 @@ const usersUpdateSubsriptionJoiSchema = Joi.object({
   subscription: Joi.string().valid('starter', 'pro', 'business').required(),
 });
 
+const usersVerifyEmailJoiSchema = Joi.object({
+  email: Joi.string()
+    .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+    .required(),
+});
+
 module.exports = {
   usersRegJoiSchema,
   usersLoginJoiSchema,
-  usersUpdateSubsriptionJoiSchema
+  usersUpdateSubsriptionJoiSchema,
+  usersVerifyEmailJoiSchema
 };
